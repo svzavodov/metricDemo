@@ -1,0 +1,30 @@
+@font-face {
+    font-family: 'Daikon';
+    src: url('./Daikon/Daikon-Bold.woff2') format('woff2'),
+        url('./Daikon/Daikon-Bold.woff') format('woff'),
+        url('./Daikon/Daikon-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Daikon';
+    src: url('./Daikon/Daikon-Regular.woff2') format('woff2'),
+        url('./Daikon/Daikon-Regular.woff') format('woff'),
+        url('./Daikon/Daikon-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Daikon';
+    src: url('./Daikon/Daikon-Medium.woff2') format('woff2'),
+        url('./Daikon/Daikon-Medium.woff') format('woff'),
+        url('./Daikon/Daikon-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
