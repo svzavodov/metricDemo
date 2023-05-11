@@ -1,6 +1,20 @@
 <template>
-<div class="card-body__propeprty-list" >
-    <div class="card-body__property-item" v-for="property in props.info" :key="property.title">
+<div class="card-body__propeprty-list" 
+    :class="{'card-body__property-list_mob flex flex-row md:hidden': mobile}" v-if="!mobile">
+    <div class="card-body__property-item" 
+        :class="{'card-body__property-item_mob': mobile}" 
+        v-for="property in props.info.slice(0,4)" 
+        >
+        <span class="property-name">{{property.title}}:</span>
+        <span class="property-value">{{property.value }}</span>
+    </div>
+ </div>
+ <div class="card-body__propeprty-list" 
+    :class="{'card-body__property-list_mob flex flex-row md:hidden': mobile}" v-else>
+    <div class="card-body__property-item" 
+        :class="{'card-body__property-item_mob': mobile}" 
+        v-for="property in props.info.slice(0,2)" 
+        >
         <span class="property-name">{{property.title}}:</span>
         <span class="property-value">{{property.value }}</span>
     </div>
@@ -8,10 +22,13 @@
 </template>
 
 <script setup>  
-
+import { ref, computed } from 'vue'
 const props = defineProps({
-    info: Array
+    info: Array,
+    mobile: false
 })
+
+
 
 </script>
 
@@ -19,6 +36,11 @@ const props = defineProps({
 .card-body__propeprty-list {
   width: 100%;
   justify-content: space-between;
+  @media screen and (max-width: 768px) {
+    justify-content: flex-start;
+    gap: 20px;
+    
+  }
   .card-body__property-item:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -50,6 +72,17 @@ const props = defineProps({
   .card-body__property-item:first-child {
     justify-content: flex-start;
     margin-left: 0;
+  }
+  .card-body__property-item_mob{
+    justify-content: flex-start;
+    width: auto;
+    padding-right: 20px;
+  }
+  .card-body__property-item_mob:last-child {
+    justify-content: flex-start;
+  }
+  .card-body__propeprty-list_mob:first-child {
+    justify-content: flex-start;
   }
 
 }

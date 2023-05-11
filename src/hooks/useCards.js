@@ -7,7 +7,7 @@ export function useCards() {
         try {
             const response = await fetch('/data/data.json')
             cards.value = await response.json()
-            cards.value = cards.value[1]
+            cards.value = cards.value
             totalPage.value = Math.ceil(cards.value.length/7)
          }catch (e){
             return e.message

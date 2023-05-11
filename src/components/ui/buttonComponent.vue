@@ -1,18 +1,18 @@
 <template>
-    <a :href="props.url" class="card-footer__button MN-btn flex justify-center" @click.prevent.once="click = false">
-    {{ click? props.text : props.text_after_click }}
+  <div></div>
+    <a :href="props.buttons[0].url" class="card-footer__button MN-btn flex justify-center" @click.prevent.once="click = false">
+    {{ click? props.buttons[0].text : props.buttons[0].text_after_click }}
     </a>
 </template>
 <script setup>
 import { ref } from 'vue'
 
 let props = defineProps({
-   url: String,
-   text: String,
-   text_after_click: String
+   buttons: Array
 })
  
 let click = ref(true)
+console.log(props.buttons);
 
 </script>
 
