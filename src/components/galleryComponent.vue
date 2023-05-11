@@ -4,12 +4,12 @@
           <div class="gallery__tags--badge">
             <img src="/assets/img/badge/badge-exclusive.png" alt="">
           </div>
-          <component :is="likeButton" @like="cardLiked" :like_button="card.like_button"></component>
+          <component :is="likeButton" @like="cardLiked" :like_button="props.like_button"></component>
           <component :is="galleryBadge"></component>
         </div>
        
-        <div class="card-gallery_item first-image">
-          <div class="gallery__arrow gallery__arrow--left arrow__disabled">
+        <div class="card-gallery_item first-image" >
+          <div class="gallery__arrow gallery__arrow--left" :class="{'arrow__disabled': number == 0}" @click="prevImg">
           <svg 
             class="arrow"
             width="10"
@@ -27,7 +27,7 @@
           </svg>
 
         </div>
-        <div class="gallery__arrow gallery__arrow--right">
+        <div class="gallery__arrow gallery__arrow--right" :class="{'arrow__disabled': number == 3}" @click="nextImg">
           <svg 
           class="arrow"
           width="10" 
@@ -44,43 +44,53 @@
             17.5281Z"/>
           </svg>
         </div>
-            <img src="/assets/img/0.jpg" alt="">
+            <img :src="props.images[number].url" alt="">
         </div>
         <div class="image-line flex flex-row gap-x-0.5 md:gap-x-1 text-xs">
-            <div class="card-gallery_item basis-1/3 md:basis-1/4 w-full">
-                <img src="/assets/img/0.jpg" alt="" >
-            </div>
-            <div class="card-gallery_item basis-1/3 md:basis-1/4 w-full">
-                <img src="/assets/img/0.jpg" alt="" >
-            </div>
-            <div class="card-gallery_item basis-1/3 md:basis-1/4 w-full">
-                <img src="/assets/img/0.jpg" alt="" >
-                <div class="overlay overlay-visible">+18 фото</div>
 
-            </div>
-            <div class="card-gallery_item relative hidden md:block basis-1/3 md:basis-1/4 w-full">
-                <img src="/assets/img/0.jpg" alt="" >
-                <div class="overlay ">+18 фото</div>
-            </div>
+              <div class="card-gallery_item basis-1/3 md:basis-1/4 w-full" 
+              v-for="(img, index) in props.images.slice(0, 4)" 
+              :key="index"
+              :class="{'hidden md:block': index == 3}">
+                <!-- <img :src="img.url_preview" :alt="img.alt" > -->
+                <img v-lazy="{src: img.url_preview, alt: img.alt}" >
+
+                <div class="overlay overlay-visible" v-if="index == 2">+{{ props.images.length }} фото</div>
+                <div class="overlay" v-if="index == 3">+{{ props.images.length }} фото</div>
+             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import likeButton from '@/components/ui/likeButton.vue';
 import galleryBadge from '@/components/ui/galleryBadge.vue';
-
-// TEST TEST TEST 
-let card = ref({
+const props = defineProps({
+  images: Array,
   like_button: {
-    active: false
-  }
+    active: Boolean,
+  },
+
 })
+
+let number = ref(0)
+const nextImg = () => {
+  if (number.value < 3 ) {
+    number.value++
+  }
+}
+
+const prevImg = () => {
+  if (number.value > 0) {
+    number.value--
+  }
+}
 
 let cardLiked = (isLiked, id) => {
   //set data in backend add like_button status to user 
 }
+
 </script>
 
 <style lang="scss">
@@ -91,87 +101,99 @@ let cardLiked = (isLiked, id) => {
     }
     .first-image{
         margin-bottom: 5px;
+        width: 100%;
+        aspect-ratio: 82/59;
         img{
             border-radius: 10px;
+            min-width: 410px;
             height: 290px;
+            max-height: 290px;
             @media screen and (max-width: 768px) {
+              min-width: 100%;
+                max-height: none;
                 height: 100%;
+                aspect-ratio: 25/18;
             }
+            @media screen and (max-width: 360px) {
+              max-height: 216px;
+              min-width: 100%;
+            }
+        }
+        .gallery__arrow {
+          z-index: 99;
+          position: absolute;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          top: 50%;
+          transform: translateY(-50%);
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          fill: white;
+          cursor: pointer;
+            &:hover {    
+              background-color: rgb(255, 255, 255);
+              fill: #0A143C;
+            }
+        }
+        .gallery__arrow--left {
+          left: 10px;
+        }
+
+        .gallery__arrow--right {
+          right: 10px;
+        }
+        .arrow__disabled{
+          cursor: not-allowed;
+          background-color: #C4C4C4;
+          fill: rgb(255, 255, 255);
+            &:hover {
+              background-color: #C4C4C4 !important;
+            fill: rgb(255, 255, 255) !important;
+          }
         }
     }
     .image-line{
+      max-height: 60px;
         @media screen and (max-width: 768px) {
+          max-height: none;
           width: 100%;
           justify-content: space-around;
         }
-        @media screen and (max-width: 360px) {
-               
-        }
         .card-gallery_item{
-            @media screen and (max-width: 768px) {
-                width: 100%;
-
-              
-            }
-        img{
-            border-radius: 10px;
-            
+          max-height: 60px;
+          @media screen and (max-width: 768px) {
+              max-height: none;
+              width: 100%ж    
+          }
+          img{
+              aspect-ratio: 33/20;
+              border-radius: 10px;
+          }
+          .overlay{
+              border-radius: 10px;
+          }
         }
-        .overlay{
-            border-radius: 10px;
-        }
-}
     }
 
 }
-
-.gallery__arrow {
-    z-index: 99;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    top: 50%;
-    transform: translateY(-50%);
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    fill: white;
-    cursor: pointer;
-    &:hover {    
-    background-color: rgb(255, 255, 255);
-    fill: #0A143C;
+  .image-line{
+    .card-gallery_item {
+      flex-basis: calc(25%);
     }
-}
-.gallery__arrow--left {
-  left: 10px;
-}
+    @media (max-width: 762px) {
+      .card-gallery_item{
+        flex-basis: calc(33.33% - 1.5px);
+      }
+      .card-gallery_item:nth-child(4) {
+        display: none;
+      }
+    }
+  }
 
-.gallery__arrow--right {
-  right: 10px;
-}
-.arrow__disabled{
-  cursor: not-allowed;
-  background-color: #C4C4C4;
-  fill: rgb(255, 255, 255);
-  &:hover {
-    background-color: #C4C4C4 !important;
-  fill: rgb(255, 255, 255) !important;
-  }
-}
-.image-line > .card-gallery_item {
-    flex-basis: calc(25%);
-  }
-@media (max-width: 762px) {
-  .image-line > .card-gallery_item {
-    flex-basis: calc(33.33% - 1.5px);
-  }
-  .image-line > .card-gallery_item:nth-child(4) {
-    display: none;
-  }
-}
 .card-gallery_item{
     position: relative;
     .overlay {
