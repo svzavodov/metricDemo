@@ -1,7 +1,10 @@
 <template>
     <div class="card bg-white rounded-5 p-[10px] md:p-[30px] ">
       <div class="card-content flex flex-col md:flex-row md:gap-x-[20px] gap-y-[10px]">
-        <component :is="galleryComponent"></component>
+        <component :is="galleryComponent" 
+                    v-if="props.card.images" 
+                    :images="props.card.images" 
+                    :like_button="props.card.like_button"></component>
         <div class="card-content__container flex flex-col">
             <div class="card-content_header flex flex-col gap-y-[10px]">
               <div class="card-header_badge flex self-start gap-x-[10px]">
@@ -11,22 +14,22 @@
                 <div class="card-header_info__block-info flex flex-col gap-y-[10px]">
                   <div class="block-info__title">
                     <a href="#" class="block-info__link md:order-1 order-1">
-                      <h3>Студия, 54 м²</h3>
+                      <h3>{{props.card.title}}</h3>
                     </a>
                   </div>
-                  <div class="block-info__price md:hidden flex md:order-2 order-2"><h2>8 500 000 ₽</h2></div>
+                  <div class="block-info__price md:hidden flex md:order-2 order-2"><h2>{{ props.card.title_extra }}</h2></div>
 
                   <div class="block-info__address md:order-3 order-4">
-                    <span class="address">Тюменская область, Тюмень, Нефтяников </span>
+                    <span class="address">{{ props.card.title_small }}</span>
                     <a href="#" class="link">Показать на карте</a>
                   </div>
                   <div class="block-info__district md:order-4 order-3">
-                    <a href="#" class="district__link">ЖК Брусника</a>
+                    <a href="#" class="district__link" v-if="district.value !== undefined">ЖК: {{ district }}</a>
                   </div>
                 </div>
                 <div class="card-header_info__block-price hidden md:flex flex-col">
-                  <div class="block-info__price"><h2>8 500 000 ₽</h2></div>
-                  <div class="block-info__per-metr">228 904 ₽/м²</div>
+                  <div class="block-info__price"><h2>{{ props.card.title_extra }}</h2></div>
+                  <div class="block-info__per-metr">{{ props.card.title_small_extra }}</div>
                 </div>
               </div>
             </div>
@@ -35,39 +38,26 @@
               
             <div class="card-content_body gap-x-[10px]">
               <div class="card-body__content hidden md:flex flex-col gap-y-[20px] ">
-                  <component :is="propertyList" :info="cards.info" class="md:flex md:flex-row hidden" ></component>
+                  <component :is="propertyList" :info="props.card.info" class="md:flex md:flex-row hidden" ></component>
                 <div class="card-body__text md:flex hidden ">
-                  Площадь данной квартиры 30,1 м2 + площадь лоджии 3,7 м2. Один собственник, 
-                  без обременений. Квартира свободна от проживания, после ремонта никто не жил, 
-                  готовы к быстрому выходу на сделку. Два окна, что позволяет удобно зонировать 
-                  пространство. Ниша под шкаф-купе в прихожей и комнате. В санузле место и выводы 
-                  под стиральную машинку. Горизонтальная разводка отопления (эффект тёплого пола 
-                  в жилой зоне и санузле). Западная сторона,…Площадь данной квартиры 30,1 м2 + 
-                  площадь лоджии 3,7 м2. Один собственник, без обременений. Квартира свободна 
-                  от проживания, после ремонта никто не жил, готовы к быстрому выходу на сделку. 
-                  Два окна, что позволяет удобно зонировать пространство. Ниша под шкаф-купе в 
-                  прихожей и комнате. В санузле место и выводы под стиральную машинку. Горизонтальная 
-                  разводка отопления (эффект тёплого пола в жилой зоне и санузле). Западная сторона,…
+                  {{props.card.description}}
                 </div>
               </div>
-              <div class="card-body__propeprty-list card-body__property-list_mob flex flex-row md:hidden">
-                <div class="card-body__property-item card-body__property-item_mob">
-                    <span class="property-name">Студия:</span>
-                    <span class="property-value">68 м²</span>
-                  </div>
-              </div>
+              <component :is="propertyList" 
+              :info="props.card.info" 
+              :mobile="true"
+                ></component>
             </div>
             <div class="card-content_footer ">
               <div class="card-footer__button-block">
 
                 <component :is="buttonComponent" 
-                          :url="buttonUrl" 
-                          :text="buttonText" 
-                          :text_after_click="buttonTextAfterClick"/>
+                           :buttons="props.card.buttons"
+                            />
               </div>
               <div class="card-footer__object-code md:flex hidden">
                 <span class="object-code__text">Код объекта:</span>
-                <span class="object-code__value">12121221</span>
+                <span class="object-code__value">{{ objectCode.value }}</span>
               </div>
             </div>  
         </div>
@@ -78,23 +68,35 @@
 
 <script setup>
 import {ref, defineProps, computed, onMounted} from 'vue'
-import {useCards} from "@/hooks/useCards.js";
 import useButtons from "@/hooks/useButtons.js";
 import galleryComponent from "@/components/galleryComponent.vue";
 import buttonComponent from '@/components/ui/buttonComponent.vue';
 import propertyList from '@/components/ui/propertyList.vue';
 import cardBadge from '@/components/ui/cardBadge.vue';
 
-const {cards, totalPage, isPostLoading } = useCards()
+const props = defineProps({
+  card: Object,
+  isPostLoading: Boolean
+})
+console.log(props.card);
 
-let buttonUrl = '/object/12121221'
-let buttonText = '+7 922 025 ...'
-let buttonTextAfterClick = '+7 922 025 53 23'
-let images = computed(() => {
-  console.log(cards.images)
-  return cards.value.images
+let objectCode = ref('')
+
+// код объекта сделал таким образом т.к. в предоставленных данных его нет
+// но как правило страница карточки является его ID, в обычной ситтуации я бы 
+// задал вопрос где мне взять эти данные и подгрузил бы их отдельно
+
+objectCode.value = computed(() => {
+  const digitRegex = /\d+/;
+    return props.card.redirect_url.match(digitRegex,'')[0]
 })
 
+let district = ref('')
+district.value = computed(() => {
+  if(props.card.info[0].title === 'ЖК'){
+    return props.card.info[0].value
+  }
+})
 
 
 </script>
@@ -117,6 +119,7 @@ hr{
 }
 
 .card{
+  max-width: 1220px;
   width: 100%;
   border-radius: 20px;
   gap: 20px;
@@ -162,6 +165,7 @@ hr{
 }
 .card-header_info__block-price {
     .block-info__price {
+      white-space: nowrap;
       @include daikonFont(24, 'normal', 500, 113%, $primary );
     }
   .block-info__per-metr {
